@@ -10,6 +10,36 @@ def getJsonData(JsonFile):
         data = json.load(f)
     return data
 
+def getJsonDataLineByLine(JsonFile):
+    data = []
+    i = 0
+    with open(JsonFile) as f:
+        for line in f:
+            i += 1
+            line = line.strip()
+            if line[0] == '[':
+                line = line[1:]
+            elif line[-1] == ']':
+                line = line[:-1]
+            if line[-1] == ',':
+                line = line[:-1]
+            try:
+                data.append(json.loads(line))
+                if i%10000 == 0: print(i, "success")
+            except:
+                data.append('''{"classBodyDeclaration": ""}''')
+                print(i, "failure")
+                print(line)
+    return data
+
+def getJsonDataSafe(JsonFile):
+    try:
+        return getJsonData(JsonFile)
+    except Exception as e:
+        print(e)
+        print("Loading JSON failed. Attempting safe method.")
+        return getJsonDataLineByLine(JsonFile)
+
 def dump_dict(data, name):
     with open(name, 'w', encoding="utf8") as f:
         json.dump(data, f)
@@ -140,7 +170,7 @@ n = int(sys.argv[1])
 print("=====[",n,"]=====")
 
 try:
-    all_data = getJsonData("../csn_big_only_trees/csn_big_{}.json".format(n))
+    all_data = getJsonDataSafe("../csn_big_only_trees/csn_big_{}.json".format(n))
 except Exception as e:
     print(e)
     print("Data csn_big_{}.json is corrupted.".format(n))
