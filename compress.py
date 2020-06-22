@@ -8,6 +8,7 @@ sys.setrecursionlimit(10000)
 
 path = sys.argv[1]
 freq = int(sys.argv[2])
+freq_k = freq//1000
 
 def getJsonData(JsonFile):
     with open(JsonFile, encoding="utf8") as f:
@@ -162,11 +163,11 @@ def build_n_compress(tree, build_dict):
         #print(parent, ":\t",code, leaf_count, id_count, var_list)
         return (code, leaf_count, id_count, var_list)
     
-abstract_code_dict = getJsonData('../CodeSearchNet/abstract_code_dict_1.5m.json')
+abstract_code_dict = getJsonData('../CodeSearchNet/abstract_code_dict_500k.json')
 abstract_code_keys = sorted(abstract_code_dict, key = lambda x:abstract_code_dict[x]['count'], reverse=True)
 num_to_compress = freq #25000 #
 #print(abstract_code_keys[num_to_compress], abstract_code_dict[abstract_code_keys[num_to_compress]])
-
+ 
 
 print("=====[",path,"]=====")
 
@@ -182,11 +183,10 @@ try:
         except Exception as e:
             # Write the data number and file name to another file for later investigation
             print(e)
-            code = ""
-            #code, _ = tree2code(all_data[i], 0)
+            code, _ = tree2code(all_data[i], 0)
         compressed_code = {"code": code}
         compressed_codes.append(compressed_code)
-    dump_dict(compressed_codes, path.replace(".json", "_compressed.json"))
+    dump_dict(compressed_codes, path.replace(".json", "_{}k_compressed.json".format(freq_k)))
 except Exception as e:
     print(e)
     print("Data {} is corrupted.".format(path))
