@@ -3,6 +3,7 @@ import ast
 import json
 import copy
 import os
+import sys
 import zipfile
 
 def add_class(method):
@@ -27,15 +28,24 @@ def getJsonData(JsonFile):
         print("JSON not found. Loading .ZIP")
         lastdot = JsonFile.rfind(".")
         ZipFile = JsonFile[:lastdot] + ".zip"
+        #current_os = sys.platform
+        lastslash = JsonFile.rfind("/")
+        if lastslash == -1:
+            targetdir = ""
+        else:
+            targetdir = JsonFile[:lastslash]
         try:
             with zipfile.ZipFile(ZipFile,"r") as zip_ref:
-                zip_ref.extractall("")
+                zip_ref.extractall(targetdir)
+        except FileNotFoundError:
+            print("ERROR! ZIP File not found.")
+        try:
             with open(JsonFile, encoding="utf8") as f:
                 data = json.load(f)
             os.remove(JsonFile)
             return data
         except FileNotFoundError:
-            print("ERROR! JSON or ZIP File not found.")
+            print("ERROR! JSON File not found.")
 
 def dump_dict(data, JsonFile):
     with open(JsonFile, 'w', encoding="utf8") as f:
